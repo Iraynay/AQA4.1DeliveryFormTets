@@ -18,29 +18,13 @@ import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.Selenide.open;
 
 public class DeliveryFormTest {
-    private WebDriver driver;
 
-    @BeforeAll
-    static void setUpAll() {
-        WebDriverManager.chromedriver().setup();
 
-    }
-
-    ChromeOptions options = new ChromeOptions();
-
-    @BeforeEach
-
-    public void setUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless");
-        driver = new ChromeDriver(options);
-    }
 
     @Test
     void shouldReturnOkMessage() {
         open("http://localhost:9999");
+
         // Configuration.holdBrowserOpen = true;
         $x("//*[@id=\"root\"]/div/form/fieldset/div[1]/div/span/span/span[1]/input").setValue("Москва");
         //  $x("//a[contains(text(),'город']/..").setValue("Казань");
