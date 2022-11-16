@@ -1,15 +1,20 @@
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.conditions.Visible;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
@@ -18,23 +23,25 @@ import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.Selenide.open;
 
 public class DeliveryFormTest {
+    public String generateDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
 
-
+    String planningDate = generateDate(4);
 
     @Test
     void shouldReturnOkMessage() {
         open("http://localhost:9999");
-
-        // Configuration.holdBrowserOpen = true;
-        $x("//*[@id=\"root\"]/div/form/fieldset/div[1]/div/span/span/span[1]/input").setValue("Москва");
-        //  $x("//a[contains(text(),'город']/..").setValue("Казань");
-        $x("//*[@id=\"root\"]/div/form/fieldset/div[2]/span/span/span/span/span[1]/input").setValue("15.11.2022");
-        $x("//input[@name='name']").setValue("Дим Димин");
-        $x("//*[@id=\"root\"]/div/form/fieldset/div[4]/span/span/span[2]/input").setValue("+70001234567");
-        //  $("[data-test-id='phone']").setValue("+70001234567");
+        $x("//input[@placeholder='Город']").setValue("Москва");
+        $("[data-test-id='date'] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $x("//input[@placeholder='Дата встречи']").setValue(planningDate);
+        $x("//input[@name='name']").setValue("Вась Васин");
+        $x("//input[@name='phone']").setValue("+70001234567");
         $("[data-test-id='agreement']").click();
-        $x("//*[@id=\"root\"]/div/form/fieldset/div[6]/div[2]/div/button/span/span[2]").click();
-        $x("//*[@id=\"root\"]/div/div").should(visible, Duration.ofSeconds(15));
+        $x("//span[contains(text(),'бронировать')]").click();
+        // $x("//input[@name='agreement']").click();
+        $x("//div[@class='notification__content']")
+                .shouldBe(visible, Duration.ofSeconds(15)).shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate));
 
     }
 }
